@@ -1,23 +1,29 @@
 "use strict";
-$('#searchButton').on("click", fetchCoords);
-function fetchCoords() {
+$('#searchButton').on("click", fetchWeather);
+function fetchWeather() {
     try {
-        let cityName = $('#searchField').val();
+        var cityName = $('#searchField').val();
         if (cityName == "")
-            throw "City name cannot be blank";
-        fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=1&appid=b70ad42d9781f26332d6aa51e4e2722e`)
-            .then(response => response.json()
-            .then(data => fetchWeather(data))
-            .catch(e => { alert(e); }));
+            throw 'City name cannot be blank';
     }
     catch (e) {
-        alert(e);
+        return alert(e);
     }
-}
-function fetchWeather(data) {
-    if (data[0] == undefined)
-        throw "Cannot find city";
-    let lat = data[0].lat;
-    let lon = data[0].lon;
-    console.log(`${lat},${lon}`);
+    //#region region 5-day
+    fetch(`http://api.openweathermap.org/data/2.5/forecast?q=${cityName}&appid=b70ad42d9781f26332d6aa51e4e2722e`)
+        .then(response => {
+        if (response.ok) {
+            return response.json();
+        }
+        else
+            throw `Error:${response.status}\nResponse:${response.statusText}`;
+    })
+        .catch(e => { return alert(e); })
+        .then(data => {
+        for (let i = 0; i < 40; i += 8) { //Jump 8*3hrs (24hrs)
+            console.log(data.list[i]);
+        }
+    })
+        .catch(e => { return alert(e); });
+    //#endregion
 }
