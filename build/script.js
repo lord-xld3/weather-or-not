@@ -9,55 +9,70 @@ function fetchWeather() {
     catch (e) {
         return alert(e);
     }
-    //#region region 5-day
-    fetch(`http://api.openweathermap.org/data/2.5/forecast?q=${cityName}&appid=b70ad42d9781f26332d6aa51e4e2722e`)
+    fetch(`http://api.openweathermap.org/data/2.5/forecast?q=${cityName}&appid=b70ad42d9781f26332d6aa51e4e2722e&units=metric`)
         .then(response => {
         if (response.ok) {
             return response.json();
         }
         else
-            throw `Error:${response.status}\nResponse:${response.statusText}`;
-    })
-        .catch(e => { return alert(e); })
+            throw `Error: ${response.status}\nResponse: ${response.statusText}`;
+    }, e => { return alert(e); })
         .then(data => {
-        for (let i = 0; i < 40; i += 8) { //Jump 8*3hrs (24hrs)
-            let date = (data.list[i].dt_txt).substr(5, 5);
+        $('#5day').children().remove();
+        let saved = localStorage.getItem('saved_city_names');
+        if (saved == null) {
+            localStorage.setItem('saved_city_names', JSON.stringify([cityName]));
+        }
+        else {
+            let savedArray = JSON.parse(saved);
+            savedArray.push(cityName);
+            localStorage.setItem('saved_city_names', JSON.stringify(savedArray));
+        }
+        for (let i = 0; i < 40; i += 8) {
             let iconID = data.list[i].weather[0].icon;
-            switch (iconID) {
-                case '01d':
+            switch (iconID.substr(0, 2)) {
+                case '01':
                     var icon = '☀';
                     break;
-                case '02d':
+                case '02':
                     var icon = '🌤';
                     break;
-                case '03d':
+                case '03':
                     var icon = '⛅';
                     break;
-                case '04d':
+                case '04':
                     var icon = '☁';
                     break;
-                case '09d':
+                case '09':
                     var icon = '🌦';
                     break;
-                case '10d':
+                case '10':
                     var icon = '🌧';
                     break;
-                case '11d':
+                case '11':
                     var icon = '⛈';
                     break;
-                case '13d':
+                case '13':
                     var icon = '🌨';
                     break;
-                case '50d':
+                case '50':
                     var icon = '🌫';
                     break;
-                default:
-                    var icon = '❔';
+                default: var icon = '❔';
             }
-            console.log(date);
-            console.log(icon);
+            let wind_direction = (data.list[i].wind.speed > 0 && data.list[i].wind.speed < 45) ? 'N'
+                : (data.list[i].wind.speed > 45 && data.list[i].wind.speed < 90) ? 'NE'
+                    : (data.list[i].wind.speed > 90 && data.list[i].wind.speed < 135) ? 'E'
+                        : (data.list[i].wind.speed > 135 && data.list[i].wind.speed < 180) ? 'SE'
+                            : (data.list[i].wind.speed > 180 && data.list[i].wind.speed < 225) ? 'S'
+                                : (data.list[i].wind.speed > 225 && data.list[i].wind.speed < 270) ? 'SW'
+                                    : (data.list[i].wind.speed > 270 && data.list[i].wind.speed < 315) ? 'W'
+                                        : 'NW';
+            let date = (data.list[i].dt_txt).substr(5, 5);
+            let temp = `Temp: ${data.list[i].main.temp}°C`;
+            let wind = `Wind: ${wind_direction}${data.list[i].wind.speed} Km/h`;
+            let humid = `Humidity:${data.list[i].main.humidity}%`;
+            $('#5day').append(`<div><div>${date}</div><div>${icon}</div><div>${temp}</div><div>${wind}</div><div>${humid}</div></div>`);
         }
-    })
-        .catch(e => { return alert(e); });
-    //#endregion
+    }, e => { return alert(e); });
 }
