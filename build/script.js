@@ -53,7 +53,7 @@ function onSearch(cityName) {
                 var date = (`${dataRef.name} (today)`);
                 parseWeather(dataRef, date, '#current');
             }),
-            fetchData(`http://api.openweathermap.org/data/2.5/forecast?q=${cityName}&appid=${apiKey}&units=metric`)
+            fetchData(`https://api.openweathermap.org/data/2.5/forecast?q=${cityName}&appid=${apiKey}&units=metric`)
                 .then(data => {
                 for (let i = 7; i < data.list.length; i += 8) {
                     var dataRef = data.list[i];

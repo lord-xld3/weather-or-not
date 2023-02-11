@@ -69,7 +69,7 @@ function onSearch(cityName:string|number|string[]|undefined) {
 					var date:string = (`${dataRef.name} (today)`)
 					parseWeather(dataRef, date, '#current')
 				}),
-			fetchData(`http://api.openweathermap.org/data/2.5/forecast?q=${cityName}&appid=${apiKey}&units=metric`)
+			fetchData(`https://api.openweathermap.org/data/2.5/forecast?q=${cityName}&appid=${apiKey}&units=metric`)
 				.then(data => {
 					// jump 8x in 3hr increments (24hrs)
 					// start at 7 (8th index), end after 39 (40th index)
