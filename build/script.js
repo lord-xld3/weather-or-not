@@ -1,51 +1,55 @@
 "use strict";
-$('#searchButton').on("click", fetchWeather);
+$('#searchButton').on("click", onSearch);
 var apiKey = 'b70ad42d9781f26332d6aa51e4e2722e';
-function fetchWeather() {
+function onSearch() {
     try {
         var cityName = $('#searchField').val();
         if (cityName == "")
             throw 'City name cannot be blank';
+        $('#current').children().remove();
+        $('#5day').children().remove();
+        const fetchCurrentWeather = new Promise((resolve, reject) => {
+            fetch(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`)
+                .then(response => checkResponse(response)).catch(err => reject(err))
+                .then(data => {
+                parseWeather(data, null, '#current');
+            });
+        });
+        const fetch5dayWeather = new Promise((resolve, reject) => {
+            fetch(`http://api.openweathermap.org/data/2.5/forecast?q=${cityName}&appid=${apiKey}&units=metric`)
+                .then(response => checkResponse(response)).catch(err => reject(err))
+                .then(data => {
+                for (let i = 0; i < 40; i += 8) {
+                    parseWeather(data, i, '#5day');
+                }
+            });
+        });
+        Promise.all([fetchCurrentWeather, fetch5dayWeather])
+            .then(_ => {
+            let saved = localStorage.getItem('saved_city_names');
+            if (saved == null) {
+                localStorage.setItem('saved_city_names', JSON.stringify([cityName]));
+            }
+            else {
+                let savedArray = JSON.parse(saved);
+                savedArray.push(cityName);
+                localStorage.setItem('saved_city_names', JSON.stringify(savedArray));
+            }
+        });
     }
     catch (err) {
-        return alert(err);
+        alert(err);
     }
-    $('#current').children().remove();
-    $('#5day').children().remove();
-    fetch(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`)
-        .then(response => checkResponse(response, 'current'), err => { return alert(err); })
-        .then(data => {
-        let { date, icon, temp, wind, humid } = parseWeather(data, null);
-        $('#current').append(`<div><div>${date}</div><div>${icon}</div><div>${temp}</div><div>${wind}</div><div>${humid}</div></div>`);
-    }, err => { return alert(err); });
-    fetch(`http://api.openweathermap.org/data/2.5/forecast?q=${cityName}&appid=${apiKey}&units=metric`)
-        .then(response => checkResponse(response, '5-day'), err => { return alert(err); })
-        .then(data => {
-        for (let i = 0; i < 40; i += 8) {
-            let { date, icon, temp, wind, humid } = parseWeather(data, i);
-            $('#5day').append(`<div><div>${date}</div><div>${icon}</div><div>${temp}</div><div>${wind}</div><div>${humid}</div></div>`);
-        }
-    }, err => { return alert(err); })
-        .then(cityName => {
-        let saved = localStorage.getItem('saved_city_names');
-        if (saved == null) {
-            localStorage.setItem('saved_city_names', JSON.stringify([cityName]));
-        }
-        else {
-            let savedArray = JSON.parse(saved);
-            savedArray.push(cityName);
-            localStorage.setItem('saved_city_names', JSON.stringify(savedArray));
-        }
-    }, err => { return alert(err); });
 }
-function checkResponse(response, fetchType) {
+function checkResponse(response) {
     if (response.ok) {
         return response.json();
     }
-    else
-        throw `Cannot fetch ${fetchType} weather!\nError: ${response.status}\nResponse: ${response.statusText}`;
+    else {
+        throw `Error: ${response.status}\nResponse: ${response.statusText}`;
+    }
 }
-function parseWeather(data, i) {
+function parseWeather(data, i, htmlID) {
     if (i != null) {
         var dataRef = data.list[i];
         var date = (dataRef.dt_txt).substr(5, 5);
@@ -103,6 +107,5 @@ function parseWeather(data, i) {
     let temp = `Temp: ${dataRef.main.temp}°C`;
     let wind = `Wind: ${wind_direction}${dataRef.wind.speed} Km/h`;
     let humid = `Humidity:${dataRef.main.humidity}%`;
-    let cardData = { date, icon, temp, wind, humid };
-    return cardData;
+    $(`${htmlID}`).append(`<div><div>${date}</div><div>${icon}</div><div>${temp}</div><div>${wind}</div><div>${humid}</div></div>`);
 }

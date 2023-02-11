@@ -1,68 +1,70 @@
-$('#searchButton').on("click",fetchWeather)
+$('#searchButton').on("click",onSearch)
 var apiKey = 'b70ad42d9781f26332d6aa51e4e2722e'
 
-function fetchWeather(){
-    // handle user input
+function onSearch(){
     try{
+        // handle user input
         var cityName = $('#searchField').val()
         if (cityName == "") 
             throw 'City name cannot be blank';
-    }catch (err) {return alert(err)}
-    
-    // clear existing results
-    $('#current').children().remove()
-    $('#5day').children().remove()
-    
-    //#region current day
-    fetch(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`)
-    .then(response => checkResponse(response,'current'),err=>{return alert(err)})
-        .then(data =>{
-            let {date,icon,temp,wind,humid} = parseWeather(data,null)
-            $('#current').append(`<div><div>${date}</div><div>${icon}</div><div>${temp}</div><div>${wind}</div><div>${humid}</div></div>`)
-        },err=>{return alert(err)})
-    //#endregion
+        
+            // clear existing results
+        $('#current').children().remove()
+        $('#5day').children().remove()
+        
+        const fetchCurrentWeather = new Promise((resolve,reject)=>{
+            fetch(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`)
+                .then(response => checkResponse(response)).catch(err=>reject(err))
+                .then(data =>{
+                    parseWeather(data,null,'#current')
+                })
+        })
 
-    //#region region 5-day
-    fetch(`http://api.openweathermap.org/data/2.5/forecast?q=${cityName}&appid=${apiKey}&units=metric`)
-    .then(response => checkResponse(response,'5-day'),err=>{return alert(err)})
-        .then(data => {
-            for(let i=0; i<40; i+=8){ //Jump 8*3hrs (24hrs)
-                let {date,icon,temp,wind,humid} = parseWeather(data,i)
-                $('#5day').append(`<div><div>${date}</div><div>${icon}</div><div>${temp}</div><div>${wind}</div><div>${humid}</div></div>`)
-            }
-        },err=>{return alert(err)})
-    //#endregion
+        const fetch5dayWeather = new Promise((resolve,reject)=>{
+            fetch(`http://api.openweathermap.org/data/2.5/forecast?q=${cityName}&appid=${apiKey}&units=metric`)
+                .then(response => checkResponse(response)).catch(err=>reject(err))
+                .then(data =>{
+                    for(let i=0; i<40; i+=8){ //Jump 8*3hrs (24hrs)
+                        parseWeather(data,i,'#5day')
+                    }
+                })
+        })
+
+        Promise.all([fetchCurrentWeather,fetch5dayWeather])
+            .then(_=>{
+                let saved = localStorage.getItem('saved_city_names')
+                if (saved==null){ // set first cityName in array
+                    localStorage.setItem('saved_city_names',JSON.stringify([cityName]))
+                }else{ // push new cityName to array
+                    let savedArray = JSON.parse(saved)
+                    savedArray.push(cityName)
+                    localStorage.setItem('saved_city_names',JSON.stringify(savedArray))
+                }
+            })
+    }catch (err){alert(err)}
     
-    //#region localStorage
-    .then(cityName =>{
-        let saved = localStorage.getItem('saved_city_names')
-        if (saved==null){ // set first cityName in array
-            localStorage.setItem('saved_city_names',JSON.stringify([cityName]))
-        }else{ // push new cityName to array
-            let savedArray = JSON.parse(saved)
-            savedArray.push(cityName)
-            localStorage.setItem('saved_city_names',JSON.stringify(savedArray))
-        }
-    },err=>{return alert(err)})
-    //#endregion
 }
 
-function checkResponse(response:any,fetchType:string){
+function checkResponse(response:any){
     if (response.ok){
         return response.json()
+    }else {
+        throw `Error: ${response.status}\nResponse: ${response.statusText}`
     }
-    else throw `Cannot fetch ${fetchType} weather!\nError: ${response.status}\nResponse: ${response.statusText}`
 }
 
-function parseWeather(data:any,i:number|null){
+function parseWeather(data:any,i:number|null,htmlID:string){
     if (i!=null){
         // refer to data.list[i] for 5-day only
         var dataRef = data.list[i]
+        
         // substr to only grab mm-dd from date
         var date:string = (dataRef.dt_txt).substr(5,5)
     }else {
         // refer to data for current day
         var dataRef = data
+        
+        // get current date
         let dateObj = new Date()
         let mm:number|string = dateObj.getMonth()+1
         let dd:number|string = dateObj.getDate()
@@ -97,9 +99,9 @@ function parseWeather(data:any,i:number|null){
     :((dataRef.wind.deg > 270) && (dataRef.wind.deg < 315))?'W⬅'
     :'NW↖'
 
+    // define data to return to generate an html element
     let temp = `Temp: ${dataRef.main.temp}°C`
     let wind = `Wind: ${wind_direction}${dataRef.wind.speed} Km/h`
     let humid = `Humidity:${dataRef.main.humidity}%`
-    let cardData = {date,icon,temp,wind,humid}
-    return cardData
+    $(`${htmlID}`).append(`<div><div>${date}</div><div>${icon}</div><div>${temp}</div><div>${wind}</div><div>${humid}</div></div>`)
 }
