@@ -4,30 +4,44 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="style" src="./reset.css">
-    <link rel="style" src="./style.css">
+    <link rel="stylesheet" href="./build/reset.css">
+    <link rel="stylesheet" href="./build/style.css">
     
     <!--Change these-->
     <title>Weather-or-Not</title>
-    <link rel="shortcut icon" href="./images/jjj.png">
+    <link rel="shortcut icon" href="./build/images/jjj.png">
 </head>
 <body>
+    
     <div id="sidebar">
-        <input id="searchField" type="text" placeholder="City name">
-        <button id="searchButton" type="button">Search</button>
+
+        <div id="searchBar">
+            <input id="searchField" type="text" placeholder="City name">
+            <button id="searchButton" type="button">Search</button>
+        </div>
+
+        <div id="savedCities">
+            <!--Generate content-->
+        </div>
+
     </div>
+
     <div id="content">
+
         <div id="current">
             <!--Generate content-->
         </div>
+
         <div id="5day">
             <!--Generate content-->
         </div>
+
     </div>
+    
     <script
     src="https://code.jquery.com/jquery-3.6.3.min.js"
     integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU="
     crossorigin="anonymous"></script>
-    <script src="./script.js"></script>
+    <script src="./build/script.js"></script>
 </body>
 </html>

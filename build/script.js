@@ -1,51 +1,72 @@
 "use strict";
-$('#searchButton').on("click", fetchWeather);
-var apiKey = 'b70ad42d9781f26332d6aa51e4e2722e';
-function fetchWeather() {
-    try {
-        var cityName = $('#searchField').val();
-        if (cityName == "")
-            throw 'City name cannot be blank';
+$('#searchButton').on("click", function () {
+    var cityName = $('#searchField').val();
+    onSearch(cityName);
+});
+initSavedCities(null);
+const apiKey = 'b70ad42d9781f26332d6aa51e4e2722e';
+function initSavedCities(cityName) {
+    let saved = localStorage.getItem('saved_city_names');
+    if (cityName != null && saved == null) {
+        var savedArray = [cityName];
+        localStorage.setItem('saved_city_names', JSON.stringify(savedArray));
     }
-    catch (err) {
-        return alert(err);
-    }
-    $('#current').children().remove();
-    $('#5day').children().remove();
-    fetch(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`)
-        .then(response => checkResponse(response, 'current'), err => { return alert(err); })
-        .then(data => {
-        let { date, icon, temp, wind, humid } = parseWeather(data, null);
-        $('#current').append(`<div><div>${date}</div><div>${icon}</div><div>${temp}</div><div>${wind}</div><div>${humid}</div></div>`);
-    }, err => { return alert(err); });
-    fetch(`http://api.openweathermap.org/data/2.5/forecast?q=${cityName}&appid=${apiKey}&units=metric`)
-        .then(response => checkResponse(response, '5-day'), err => { return alert(err); })
-        .then(data => {
-        for (let i = 0; i < 40; i += 8) {
-            let { date, icon, temp, wind, humid } = parseWeather(data, i);
-            $('#5day').append(`<div><div>${date}</div><div>${icon}</div><div>${temp}</div><div>${wind}</div><div>${humid}</div></div>`);
-        }
-    }, err => { return alert(err); })
-        .then(cityName => {
-        let saved = localStorage.getItem('saved_city_names');
-        if (saved == null) {
-            localStorage.setItem('saved_city_names', JSON.stringify([cityName]));
-        }
-        else {
-            let savedArray = JSON.parse(saved);
+    else {
+        var savedArray = JSON.parse(saved);
+        if (cityName != null && !(savedArray.includes(cityName))) {
             savedArray.push(cityName);
             localStorage.setItem('saved_city_names', JSON.stringify(savedArray));
         }
-    }, err => { return alert(err); });
-}
-function checkResponse(response, fetchType) {
-    if (response.ok) {
-        return response.json();
     }
-    else
-        throw `Cannot fetch ${fetchType} weather!\nError: ${response.status}\nResponse: ${response.statusText}`;
+    if (savedArray != null) {
+        $('#savedCities').children().remove();
+        for (let i = 0; i < savedArray.length; i++) {
+            $('#savedCities').append(`<button class='cityButton'>${savedArray[i]}</button>`);
+        }
+        let buttonArray = document.querySelectorAll('.cityButton');
+        for (let i = 0; i < buttonArray.length; i++) {
+            buttonArray[i].addEventListener("click", function () {
+                onSearch($(buttonArray[i]).text());
+            });
+        }
+    }
 }
-function parseWeather(data, i) {
+function onSearch(cityName) {
+    try {
+        if (!cityName)
+            throw 'City name cannot be blank';
+        $('#current').children().remove();
+        $('#5day').children().remove();
+        const fetchData = (url) => fetch(url)
+            .then(response => {
+            if (!response.ok)
+                throw `Error: ${response.status}\nResponse: ${response.statusText}`;
+            else
+                return response.json();
+        })
+            .catch(err => Promise.reject(err));
+        Promise.all([
+            fetchData(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`)
+                .then(data => {
+                parseWeather(data, null, '#current');
+            }),
+            fetchData(`http://api.openweathermap.org/data/2.5/forecast?q=${cityName}&appid=${apiKey}&units=metric`)
+                .then(data => {
+                for (let i = 0; i < 40; i += 8) {
+                    parseWeather(data, i, '#5day');
+                }
+            })
+        ])
+            .then(() => {
+            initSavedCities(cityName);
+        })
+            .catch(err => alert(err));
+    }
+    catch (err) {
+        alert(err);
+    }
+}
+function parseWeather(data, i, htmlID) {
     if (i != null) {
         var dataRef = data.list[i];
         var date = (dataRef.dt_txt).substr(5, 5);
@@ -103,6 +124,5 @@ function parseWeather(data, i) {
     let temp = `Temp: ${dataRef.main.temp}°C`;
     let wind = `Wind: ${wind_direction}${dataRef.wind.speed} Km/h`;
     let humid = `Humidity:${dataRef.main.humidity}%`;
-    let cardData = { date, icon, temp, wind, humid };
-    return cardData;
+    $(`${htmlID}`).append(`<div><div>${date}</div><div>${icon}</div><div>${temp}</div><div>${wind}</div><div>${humid}</div></div>`);
 }
