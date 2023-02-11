@@ -1,122 +1,122 @@
 "use strict";
 $('#searchButton').on("click", function () {
-    var cityName = $('#searchField').val();
-    onSearch(cityName);
+    let city_name = $('#searchField').val();
+    search_Button_Clicked(city_name);
 });
-initSavedCities(null);
-const apiKey = 'b70ad42d9781f26332d6aa51e4e2722e';
-function initSavedCities(cityName) {
-    let saved = localStorage.getItem('saved_city_names');
-    if (cityName != null && saved == null) {
-        var savedArray = [cityName];
-        localStorage.setItem('saved_city_names', JSON.stringify(savedArray));
+check_And_Init_Saved_City_Names(null);
+const api_key = 'b70ad42d9781f26332d6aa51e4e2722e';
+function check_And_Init_Saved_City_Names(city_name) {
+    let storage_data = localStorage.getItem('saved_city_names');
+    if (city_name != null && storage_data == null) {
+        var saved_city_array = [city_name];
+        localStorage.setItem('saved_city_names', JSON.stringify(saved_city_array));
     }
     else {
-        var savedArray = JSON.parse(saved);
-        if (cityName != null && !(savedArray.includes(cityName))) {
-            savedArray.push(cityName);
-            localStorage.setItem('saved_city_names', JSON.stringify(savedArray));
+        var saved_city_array = JSON.parse(storage_data);
+        if (city_name != null && !(saved_city_array.includes(city_name))) {
+            saved_city_array.push(city_name);
+            localStorage.setItem('saved_city_names', JSON.stringify(saved_city_array));
         }
     }
-    if (savedArray != null) {
+    if (saved_city_array != null) {
         $('#savedCities').children().remove();
-        for (let i = 0; i < savedArray.length; i++) {
-            $('#savedCities').append(`<button class='cityButton'>${savedArray[i]}</button>`);
+        for (let i = 0; i < saved_city_array.length; i++) {
+            $('#savedCities').append(`<button class='cityButton'>${saved_city_array[i]}</button>`);
         }
-        let buttonArray = document.querySelectorAll('.cityButton');
-        for (let i = 0; i < buttonArray.length; i++) {
-            buttonArray[i].addEventListener("click", function () {
-                onSearch($(buttonArray[i]).text());
+        let city_button_array = document.querySelectorAll('.cityButton');
+        for (let i = 0; i < city_button_array.length; i++) {
+            city_button_array[i].addEventListener("click", function () {
+                search_Button_Clicked($(city_button_array[i]).text());
             });
         }
     }
 }
-function onSearch(cityName) {
+function search_Button_Clicked(city_name) {
     try {
         $('#content').css('display', 'none');
-        if (!cityName)
+        if (!city_name)
             throw 'City name cannot be blank';
         $('#current').children().remove();
         $('#fiveday').children().remove();
-        const fetchData = (url) => fetch(url)
-            .then(response => {
-            if (!response.ok)
-                throw `Error: ${response.status}\nResponse: ${response.statusText}`;
+        const fetch_Function = (fetch_url) => fetch(fetch_url)
+            .then(fetch_response => {
+            if (!fetch_response.ok)
+                throw `Error: ${fetch_response.status}\nResponse: ${fetch_response.statusText}`;
             else
-                return response.json();
+                return fetch_response.json();
         })
-            .catch(err => Promise.reject(err));
+            .catch(error => Promise.reject(error));
         Promise.all([
-            fetchData(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`)
-                .then(data => {
-                var dataRef = data;
-                var date = (`${dataRef.name} (today)`);
-                parseWeather(dataRef, date, '#current');
+            fetch_Function(`https://api.openweathermap.org/data/2.5/weather?q=${city_name}&appid=${api_key}&units=metric`)
+                .then(response_data => {
+                let data_reference = response_data;
+                let weather_date = (`${data_reference.name} (today)`);
+                parse_Weather_Data(data_reference, weather_date, '#current');
             }),
-            fetchData(`https://api.openweathermap.org/data/2.5/forecast?q=${cityName}&appid=${apiKey}&units=metric`)
-                .then(data => {
-                for (let i = 7; i < data.list.length; i += 8) {
-                    var dataRef = data.list[i];
-                    var date = (dataRef.dt_txt).substr(5, 5);
-                    parseWeather(dataRef, date, '#fiveday');
+            fetch_Function(`https://api.openweathermap.org/data/2.5/forecast?q=${city_name}&appid=${api_key}&units=metric`)
+                .then(response_data => {
+                for (let i = 7; i < response_data.list.length; i += 8) {
+                    let data_reference = response_data.list[i];
+                    let weather_date = (data_reference.dt_txt).substr(5, 5);
+                    parse_Weather_Data(data_reference, weather_date, '#fiveday');
                 }
             })
         ])
             .then(() => {
-            initSavedCities(cityName);
+            check_And_Init_Saved_City_Names(city_name);
         })
             .then(() => {
             $('#content').css('display', 'flex');
         })
-            .catch(err => alert(err));
+            .catch(error => alert(error));
     }
-    catch (err) {
-        alert(err);
+    catch (error) {
+        alert(error);
     }
 }
-function parseWeather(dataRef, date, htmlID) {
-    let iconID = dataRef.weather[0].icon;
-    switch (iconID.substr(0, 2)) {
+function parse_Weather_Data(data_reference, weather_date, html_weather_id) {
+    let weather_iconID = data_reference.weather[0].icon;
+    switch (weather_iconID.substr(0, 2)) {
         case '01':
-            var icon = '☀';
+            var weather_icon = '☀';
             break;
         case '02':
-            var icon = '🌤';
+            var weather_icon = '🌤';
             break;
         case '03':
-            var icon = '⛅';
+            var weather_icon = '⛅';
             break;
         case '04':
-            var icon = '☁';
+            var weather_icon = '☁';
             break;
         case '09':
-            var icon = '🌦';
+            var weather_icon = '🌦';
             break;
         case '10':
-            var icon = '🌧';
+            var weather_icon = '🌧';
             break;
         case '11':
-            var icon = '⛈';
+            var weather_icon = '⛈';
             break;
         case '13':
-            var icon = '🌨';
+            var weather_icon = '🌨';
             break;
         case '50':
-            var icon = '🌫';
+            var weather_icon = '🌫';
             break;
-        default: var icon = '❔';
+        default: var weather_icon = '❔';
     }
-    let wind_direction = ((dataRef.wind.deg > 0) && (dataRef.wind.deg < 45)) ? 'N⬆'
-        : ((dataRef.wind.deg > 45) && (dataRef.wind.deg < 90)) ? 'NE↗'
-            : ((dataRef.wind.deg > 90) && (dataRef.wind.deg < 135)) ? 'E➡'
-                : ((dataRef.wind.deg > 135) && (dataRef.wind.deg < 180)) ? 'SE↘'
-                    : ((dataRef.wind.deg > 180) && (dataRef.wind.deg < 225)) ? 'S⬇'
-                        : ((dataRef.wind.deg > 225) && (dataRef.wind.deg < 270)) ? 'SW↙'
-                            : ((dataRef.wind.deg > 270) && (dataRef.wind.deg < 315)) ? 'W⬅'
+    let wind_direction = ((data_reference.wind.deg > 0) && (data_reference.wind.deg < 45)) ? 'N⬆'
+        : ((data_reference.wind.deg > 45) && (data_reference.wind.deg < 90)) ? 'NE↗'
+            : ((data_reference.wind.deg > 90) && (data_reference.wind.deg < 135)) ? 'E➡'
+                : ((data_reference.wind.deg > 135) && (data_reference.wind.deg < 180)) ? 'SE↘'
+                    : ((data_reference.wind.deg > 180) && (data_reference.wind.deg < 225)) ? 'S⬇'
+                        : ((data_reference.wind.deg > 225) && (data_reference.wind.deg < 270)) ? 'SW↙'
+                            : ((data_reference.wind.deg > 270) && (data_reference.wind.deg < 315)) ? 'W⬅'
                                 : 'NW↖';
-    let temp = `Temp: ${dataRef.main.temp}°C`;
-    let wind = `Wind: ${wind_direction}
-	${dataRef.wind.speed}Km/h`;
-    let humid = `Humidity: ${dataRef.main.humidity}%`;
-    $(`${htmlID}`).append(`<div class='weathercard'><span>${date}</span><span class='iconic'>${icon}</span><span>${temp}</span><span>${wind}</span><span>${humid}</span></span>`);
+    let weather_temp = `Temp: ${data_reference.main.temp}°C`;
+    let weather_wind = `Wind: ${wind_direction}
+	${data_reference.wind.speed}Km/h`;
+    let weather_humidity = `Humidity: ${data_reference.main.humidity}%`;
+    $(`${html_weather_id}`).append(`<div class='weathercard'><span>${weather_date}</span><span class='iconic'>${weather_icon}</span><span>${weather_temp}</span><span>${weather_wind}</span><span>${weather_humidity}</span></span>`);
 }
