@@ -2,131 +2,109 @@
     font-size: 2vmax;
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }
-
 html{
-    background: linear-gradient(90deg, rgb(44, 1, 28),rgb(44, 1, 70));
+    background: linear-gradient(90deg, rgb(36, 0, 69),rgb(69, 0, 42));
     width: 100%;
     height: 100%;
 }
-
 body{
     display: flex;
     flex-direction: column;
 }
-
 header{
     display: flex;
     flex-direction: column;
     font-size: 4vmax;
     color: white;
-    background-color: rgb(9, 70, 47);
+    background-image: linear-gradient(45deg, rgb(0, 54, 0),rgb(0, 59, 82));
     text-align: center;
     border: 0.1vmax solid black;
     padding: 0.4vmax;
     margin: 1vmax;
     margin-bottom: 0;
 }
-
 section{
     display: flex;
     flex-direction: row;
 }
-
-button,input{
-    text-align: center;
-}
-
 button{
     border: 0.1vmax solid black;
-    background-color: rgb(52, 118, 145);
+    background-image: linear-gradient(45deg,rgb(0, 10, 100),rgb(0, 126, 175));
     color: white;
     padding: 0.4vmax;
     margin: 0.2vmax;
-}
-
-#savedCities button,#seachButton{
+    text-align: center;
     display: flex;
     flex-direction: row;
-    flex-basis: 1 1 0;
+    flex: 1 1 0;
     justify-content: center;
 }
-
 #savedCities,#searchBar{
     display: flex;
     flex-direction: column;
-    justify-content: stretch;
     width: auto;
 }
-
 #searchButton{
-    background-color: red;
+    background-image: linear-gradient(45deg,rgb(105, 0, 0),rgb(255, 0, 0));
     margin-bottom: 4vmax;
 }
-
 #searchField{
     padding: 1vmax;
     margin: 0.2vmax;
-    border: 0.1vmax solid black;
+    border: 0.2vmax solid black;
 }
-
 #sideBar{
     margin: 1vmax 1vmax;
-    width: 20vmax;
+    width: 15vmax;
 }
-
 #content{
     display: none;
     flex-direction: column;
     margin-top: 1vmax;
     margin-right: 1vmax;
-    width: 77%;
+    width: 90%;
 }
-
 #current,#fiveday{
-    border: 0.1vmax solid black;
-    background-color: rgb(7, 78, 78);
+    border: 0.2vmax solid rgb(0, 0, 0);
+    background-image: linear-gradient(180deg,rgb(22, 94, 0),rgb(58, 0, 0));
     color: white;
-    margin-bottom: 1vmax;
-    padding: 1vmax;
+    margin-bottom: 0.4vmax;
+    padding: 0vmax;
 }
-
 #fiveday{
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    flex-basis: 1 1 0;
+    flex: 1 1 0;
     justify-content: space-evenly;
 }
-
-.weathercard span{
-    padding: 0.5vmax;
+span{
+    padding: 0.2vmax 0.4vmax;
 }
-
 .weathercard{
-    border: 0.1vmax solid gold;
+    background-image: linear-gradient(45deg, rgb(0, 0, 105),rgb(0, 94, 73));
+    border: 0.2vmax ridge gold;
     margin: 0.4vmax;
     display: flex;
     flex-direction: column;
-    flex-basis: 1 1 0;
+    flex: 1 1 0;
     align-items: flex-start;
     width: min-content;
-    text-align: none;
     justify-content: space-between;
 }
-
 .iconic{
     font-size: 6vmax;
+    padding: 0 0 0 2vmax;
+    margin-bottom: 0px;
 }
-
 #current div{
     width: auto;
 }
-
-@media screen and (max-width:880px) {
+@media screen and (max-width:800px) {
     #fiveday{
         flex-direction: column;
-    }
+   }
     #fiveday div{
-        width: 98.5%;
-    }
+        width: auto
+   }
 }

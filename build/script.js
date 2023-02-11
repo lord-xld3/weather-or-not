@@ -49,12 +49,16 @@ function onSearch(cityName) {
         Promise.all([
             fetchData(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`)
                 .then(data => {
-                parseWeather(data, null, '#current');
+                var dataRef = data;
+                var date = (`${dataRef.name} (today)`);
+                parseWeather(dataRef, date, '#current');
             }),
             fetchData(`http://api.openweathermap.org/data/2.5/forecast?q=${cityName}&appid=${apiKey}&units=metric`)
                 .then(data => {
                 for (let i = 0; i < 40; i += 8) {
-                    parseWeather(data, i, '#fiveday');
+                    var dataRef = data.list[i];
+                    var date = (dataRef.dt_txt).substr(5, 5);
+                    parseWeather(dataRef, date, '#fiveday');
                 }
             })
         ])
@@ -70,15 +74,7 @@ function onSearch(cityName) {
         alert(err);
     }
 }
-function parseWeather(data, i, htmlID) {
-    if (i != null) {
-        var dataRef = data.list[i];
-        var date = (dataRef.dt_txt).substr(5, 5);
-    }
-    else {
-        var dataRef = data;
-        var date = (`${dataRef.name} (today)`);
-    }
+function parseWeather(dataRef, date, htmlID) {
     let iconID = dataRef.weather[0].icon;
     switch (iconID.substr(0, 2)) {
         case '01':
@@ -119,7 +115,8 @@ function parseWeather(data, i, htmlID) {
                             : ((dataRef.wind.deg > 270) && (dataRef.wind.deg < 315)) ? 'W⬅'
                                 : 'NW↖';
     let temp = `Temp: ${dataRef.main.temp}°C`;
-    let wind = `Wind: ${wind_direction}${dataRef.wind.speed} Km/h`;
-    let humid = `Humidity:${dataRef.main.humidity}%`;
+    let wind = `Wind: ${wind_direction}
+	${dataRef.wind.speed}Km/h`;
+    let humid = `Humidity: ${dataRef.main.humidity}%`;
     $(`${htmlID}`).append(`<div class='weathercard'><span>${date}</span><span class='iconic'>${icon}</span><span>${temp}</span><span>${wind}</span><span>${humid}</span></span>`);
 }
