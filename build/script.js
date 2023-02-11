@@ -4,17 +4,16 @@ var apiKey = 'b70ad42d9781f26332d6aa51e4e2722e';
 function onSearch() {
     try {
         var cityName = $('#searchField').val();
-        if (cityName == "")
+        if (!cityName)
             throw 'City name cannot be blank';
         $('#current').children().remove();
         $('#5day').children().remove();
         const fetchCurrentWeather = new Promise((resolve, reject) => {
             fetch(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`)
                 .then(response => checkResponse(response))
-                .then(data => {
-                parseWeather(data, null, '#current');
-            })
-                .then(resolve).catch(err => reject(err));
+                .then(data => parseWeather(data, null, '#current'))
+                .then(resolve)
+                .catch(err => reject(err));
         });
         const fetch5dayWeather = new Promise((resolve, reject) => {
             fetch(`http://api.openweathermap.org/data/2.5/forecast?q=${cityName}&appid=${apiKey}&units=metric`)
@@ -24,12 +23,13 @@ function onSearch() {
                     parseWeather(data, i, '#5day');
                 }
             })
-                .then(resolve).catch(err => reject(err));
+                .then(resolve)
+                .catch(err => reject(err));
         });
         Promise.all([fetchCurrentWeather, fetch5dayWeather])
             .then(() => {
             let saved = localStorage.getItem('saved_city_names');
-            if (saved == null) {
+            if (!saved) {
                 localStorage.setItem('saved_city_names', JSON.stringify([cityName]));
             }
             else {
@@ -37,22 +37,20 @@ function onSearch() {
                 savedArray.push(cityName);
                 localStorage.setItem('saved_city_names', JSON.stringify(savedArray));
             }
-        }).catch(err => alert(err));
+        })
+            .catch(err => alert(err));
     }
     catch (err) {
         alert(err);
     }
 }
 function checkResponse(response) {
-    if (response.ok) {
+    if (response.ok)
         return response.json();
-    }
-    else {
-        throw `Error: ${response.status}\nResponse: ${response.statusText}`;
-    }
+    throw `Error: ${response.status}\nResponse: ${response.statusText}`;
 }
 function parseWeather(data, i, htmlID) {
-    if (i != null) {
+    if (i) {
         var dataRef = data.list[i];
         var date = (dataRef.dt_txt).substr(5, 5);
     }
