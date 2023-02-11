@@ -1,0 +1,30 @@
+button{
+    background-color: rgb(63, 137, 167);
+    color: white;
+    padding: 1vmax;
+    margin: 0.2vmax;
+}
+
+#savedCities button,#seachButton{
+    display: flex;
+    flex-direction: row;
+    flex-basis: 1 1 0;
+    justify-content: center;
+}
+
+#savedCities,#searchBar{
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+    width: 20vmax;
+}
+
+#searchButton{
+    margin-bottom: 1vmax;
+    background-color: red;
+}
+
+#searchField{
+    padding: 1vmax;
+    margin: 0.2vmax;
+}
