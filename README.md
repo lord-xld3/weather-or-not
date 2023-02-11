@@ -1,31 +1,19 @@
-# typescript-web-client-template
+# weather-or-not
 
-Clone this and add assets. Run following commands in PowerShell.
+A website where you can search for a city, and it will automatically be saved so you can easily search for it again.
 
-## 1. Setup TypeScript/npm workaround (one-time)
+[Website](https://lord-xld3.github.io/weather-or-not/)
 
-Install typescript compiler
->`npm install -g typescript`
+![Demo image](./build/images/weatherdemo.PNG)
 
-Next line **must** be run in an admin Powershell window
->`Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope LocalMachine`
+## Info
 
-## 2. (Optional)
+Not much planning went into this one, there is very little control flow to worry about. I went straight for 'getting the API data', then a time consuming process of handling errors and getting promises to work correctly (the secret sauce was using .catch at the END of our .then chain), and finally some refactoring + beautification.
 
-Install jQuery
->`npm install --save @types/jquery`
+Since I'm using TypeScript, please refer to /src/script.ts for cleaner code + comments.
 
-## 3. Usage
+CSS was a breeze. I'm not using any frameworks and this is certainly the most organized my code has ever been. I had to go back and forth a bit to show/hide elements and add event listeners.
 
-### Start Compiler
+HTML is well organized too, and I'm getting pretty good at using flex boxes.
 
-Run once, it will compile whenever you save a .ts file
->`tsc -p .\tsconfig.json`
-
-### /src/lib.d.ts
-
-Declare type definitions here (optional, makes script.ts cleaner), don't assign values
-
-### /src/script.ts
-
-Write program here, it will compile to .js
+One improvement that could be made, is when the screen becomes wide enough a scroll bar appears. I'm using 'vmax' for just about everything because it makes it really easy to adapt to screen sizes, and this appears to be a side-effect of doing that. Perhaps a simple @media and screen (max-width:xxx, min-height:yyy) is all we need. Feel free to leave a suggestion there.

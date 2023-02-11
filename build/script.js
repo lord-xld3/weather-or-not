@@ -77,14 +77,7 @@ function parseWeather(data, i, htmlID) {
     }
     else {
         var dataRef = data;
-        let dateObj = new Date();
-        let mm = dateObj.getMonth() + 1;
-        let dd = dateObj.getDate();
-        if (mm < 10)
-            mm = '0' + mm;
-        if (dd < 10)
-            dd = '0' + dd;
-        var date = (`${mm}-${dd}`);
+        var date = (`${dataRef.name} (today)`);
     }
     let iconID = dataRef.weather[0].icon;
     switch (iconID.substr(0, 2)) {

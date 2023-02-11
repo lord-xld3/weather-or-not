@@ -1,9 +1,11 @@
-$('#searchButton').on("click", function(){
-	var cityName = $('#searchField').val()
-	onSearch(cityName)
-})
-initSavedCities(null)
-const apiKey = 'b70ad42d9781f26332d6aa51e4e2722e'
+//#region Init
+	$('#searchButton').on("click", function(){
+		var cityName = $('#searchField').val()
+		onSearch(cityName)
+	})
+	initSavedCities(null)
+	const apiKey = 'b70ad42d9781f26332d6aa51e4e2722e'
+//#endregion
 
 function initSavedCities(cityName:any){
 	
@@ -40,7 +42,7 @@ function initSavedCities(cityName:any){
 	}
 }
 
-function onSearch(cityName:any) {
+function onSearch(cityName:string|number|string[]|undefined) {
 	try {
 		$('#content').css('display','none')
 		// handle user input
@@ -49,7 +51,6 @@ function onSearch(cityName:any) {
 		$('#current').children().remove()
 		$('#fiveday').children().remove()
 		
-
 		// define a function that returns a promise
 		const fetchData = (url: string) =>
 		fetch(url)
@@ -59,7 +60,8 @@ function onSearch(cityName:any) {
 				else return response.json()
 			})
 			.catch(err => Promise.reject(err))
-
+		
+		// run ^^^ function twice with different parameters
 		Promise.all([
 			fetchData(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`)
 				.then(data => {
@@ -67,6 +69,7 @@ function onSearch(cityName:any) {
 				}),
 			fetchData(`http://api.openweathermap.org/data/2.5/forecast?q=${cityName}&appid=${apiKey}&units=metric`)
 				.then(data => {
+					// jump 8x in 3hr increments (24hrs)
 					for (let i = 0; i < 40; i += 8) {
 						parseWeather(data, i, '#fiveday')
 					}
@@ -86,20 +89,12 @@ function parseWeather(data:any,i:number|null,htmlID:string){
 	if (i!=null){
 		// refer to data.list[i] for 5-day only
 		var dataRef = data.list[i]
-		
 		// substr to only grab mm-dd from date
 		var date:string = (dataRef.dt_txt).substr(5,5)
 	}else {
 		// refer to data for current day
 		var dataRef = data
-		
-		// get current date
-		let dateObj = new Date()
-		let mm:number|string = dateObj.getMonth()+1
-		let dd:number|string = dateObj.getDate()
-		if (mm<10) mm = '0' + mm
-		if (dd<10) dd = '0' + dd
-		var date:string = (`${mm}-${dd}`)
+		var date:string = (`${dataRef.name} (today)`)
 	}
 	
 	//refer to https://openweathermap.org/weather-conditions#Weather-Condition-Codes-2
@@ -128,7 +123,7 @@ function parseWeather(data:any,i:number|null,htmlID:string){
 	:((dataRef.wind.deg > 270) && (dataRef.wind.deg < 315))?'W⬅'
 	:'NW↖'
 
-	// define data to return to generate an html element
+	// define data to generate an html element
 	let temp = `Temp: ${dataRef.main.temp}°C`
 	let wind = `Wind: ${wind_direction}${dataRef.wind.speed} Km/h`
 	let humid = `Humidity:${dataRef.main.humidity}%`
