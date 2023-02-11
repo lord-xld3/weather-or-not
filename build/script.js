@@ -33,10 +33,11 @@ function initSavedCities(cityName) {
 }
 function onSearch(cityName) {
     try {
+        $('#content').css('display', 'none');
         if (!cityName)
             throw 'City name cannot be blank';
         $('#current').children().remove();
-        $('#5day').children().remove();
+        $('#fiveday').children().remove();
         const fetchData = (url) => fetch(url)
             .then(response => {
             if (!response.ok)
@@ -53,12 +54,15 @@ function onSearch(cityName) {
             fetchData(`http://api.openweathermap.org/data/2.5/forecast?q=${cityName}&appid=${apiKey}&units=metric`)
                 .then(data => {
                 for (let i = 0; i < 40; i += 8) {
-                    parseWeather(data, i, '#5day');
+                    parseWeather(data, i, '#fiveday');
                 }
             })
         ])
             .then(() => {
             initSavedCities(cityName);
+        })
+            .then(() => {
+            $('#content').css('display', 'flex');
         })
             .catch(err => alert(err));
     }
@@ -124,5 +128,5 @@ function parseWeather(data, i, htmlID) {
     let temp = `Temp: ${dataRef.main.temp}°C`;
     let wind = `Wind: ${wind_direction}${dataRef.wind.speed} Km/h`;
     let humid = `Humidity:${dataRef.main.humidity}%`;
-    $(`${htmlID}`).append(`<div><div>${date}</div><div>${icon}</div><div>${temp}</div><div>${wind}</div><div>${humid}</div></div>`);
+    $(`${htmlID}`).append(`<div class='weathercard'><span>${date}</span><span class='iconic'>${icon}</span><span>${temp}</span><span>${wind}</span><span>${humid}</span></span>`);
 }

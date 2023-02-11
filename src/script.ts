@@ -42,11 +42,13 @@ function initSavedCities(cityName:any){
 
 function onSearch(cityName:any) {
 	try {
+		$('#content').css('display','none')
 		// handle user input
 		if (!cityName) throw 'City name cannot be blank'
 		// clear existing results
 		$('#current').children().remove()
-		$('#5day').children().remove()
+		$('#fiveday').children().remove()
+		
 
 		// define a function that returns a promise
 		const fetchData = (url: string) =>
@@ -66,12 +68,15 @@ function onSearch(cityName:any) {
 			fetchData(`http://api.openweathermap.org/data/2.5/forecast?q=${cityName}&appid=${apiKey}&units=metric`)
 				.then(data => {
 					for (let i = 0; i < 40; i += 8) {
-						parseWeather(data, i, '#5day')
+						parseWeather(data, i, '#fiveday')
 					}
 				})
 		])
 		.then(() => { // if both promises are resolved
 			initSavedCities(cityName)
+		})
+		.then(() => {
+			$('#content').css('display','flex')
 		})
 		.catch(err => alert(err)) // catch failed fetches
   	} catch (err) {alert(err)} // catch user input, mainly
@@ -127,5 +132,5 @@ function parseWeather(data:any,i:number|null,htmlID:string){
 	let temp = `Temp: ${dataRef.main.temp}°C`
 	let wind = `Wind: ${wind_direction}${dataRef.wind.speed} Km/h`
 	let humid = `Humidity:${dataRef.main.humidity}%`
-	$(`${htmlID}`).append(`<div><div>${date}</div><div>${icon}</div><div>${temp}</div><div>${wind}</div><div>${humid}</div></div>`)
+	$(`${htmlID}`).append(`<div class='weathercard'><span>${date}</span><span class='iconic'>${icon}</span><span>${temp}</span><span>${wind}</span><span>${humid}</span></span>`)
 }
