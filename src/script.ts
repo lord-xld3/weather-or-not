@@ -72,7 +72,8 @@ function onSearch(cityName:string|number|string[]|undefined) {
 			fetchData(`http://api.openweathermap.org/data/2.5/forecast?q=${cityName}&appid=${apiKey}&units=metric`)
 				.then(data => {
 					// jump 8x in 3hr increments (24hrs)
-					for (let i = 0; i < 40; i += 8) {
+					// start at 7 (8th index), end after 39 (40th index)
+					for (let i = 7; i < data.list.length; i += 8) {
 						var dataRef = data.list[i]
 						// substr to only grab mm-dd from date
 						var date:string = (dataRef.dt_txt).substr(5,5)

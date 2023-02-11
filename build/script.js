@@ -55,7 +55,7 @@ function onSearch(cityName) {
             }),
             fetchData(`http://api.openweathermap.org/data/2.5/forecast?q=${cityName}&appid=${apiKey}&units=metric`)
                 .then(data => {
-                for (let i = 0; i < 40; i += 8) {
+                for (let i = 7; i < data.list.length; i += 8) {
                     var dataRef = data.list[i];
                     var date = (dataRef.dt_txt).substr(5, 5);
                     parseWeather(dataRef, date, '#fiveday');
