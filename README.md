@@ -15,5 +15,3 @@ Since I'm using TypeScript, please refer to /src/script.ts for cleaner code + co
 CSS was a breeze. I'm not using any frameworks and this is certainly the most organized my code has ever been. I had to go back and forth a bit to show/hide elements and add event listeners.
 
 HTML is well organized too, and I'm getting pretty good at using flex boxes.
-
-One improvement that could be made, is when the screen becomes wide enough a scroll bar appears. I'm using 'vmax' for just about everything because it makes it really easy to adapt to screen sizes, and this appears to be a side-effect of doing that. Perhaps a simple @media and screen (max-width:xxx, min-height:yyy) is all we need. Feel free to leave a suggestion there.
