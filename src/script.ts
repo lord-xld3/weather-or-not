@@ -14,24 +14,27 @@ function onSearch(){
         
         const fetchCurrentWeather = new Promise((resolve,reject)=>{
             fetch(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`)
-                .then(response => checkResponse(response)).catch(err=>reject(err))
+                .then(response => checkResponse(response))
                 .then(data =>{
                     parseWeather(data,null,'#current')
+                    
                 })
+                .then(resolve).catch(err=>reject(err))
         })
 
         const fetch5dayWeather = new Promise((resolve,reject)=>{
             fetch(`http://api.openweathermap.org/data/2.5/forecast?q=${cityName}&appid=${apiKey}&units=metric`)
-                .then(response => checkResponse(response)).catch(err=>reject(err))
+                .then(response => checkResponse(response))
                 .then(data =>{
                     for(let i=0; i<40; i+=8){ //Jump 8*3hrs (24hrs)
                         parseWeather(data,i,'#5day')
                     }
                 })
+                .then(resolve).catch(err=>reject(err))
         })
 
         Promise.all([fetchCurrentWeather,fetch5dayWeather])
-            .then(_=>{
+            .then(()=>{
                 let saved = localStorage.getItem('saved_city_names')
                 if (saved==null){ // set first cityName in array
                     localStorage.setItem('saved_city_names',JSON.stringify([cityName]))
@@ -40,7 +43,7 @@ function onSearch(){
                     savedArray.push(cityName)
                     localStorage.setItem('saved_city_names',JSON.stringify(savedArray))
                 }
-            })
+            }).catch(err=>alert(err))
     }catch (err){alert(err)}
     
 }
