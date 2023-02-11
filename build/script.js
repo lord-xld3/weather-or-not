@@ -31,6 +31,14 @@ function check_And_Init_Saved_City_Names(city_name) {
         }
     }
 }
+const fetch_Function = (fetch_url) => fetch(fetch_url)
+    .then(fetch_response => {
+    if (!fetch_response.ok)
+        throw `Error: ${fetch_response.status}\nResponse: ${fetch_response.statusText}`;
+    else
+        return fetch_response.json();
+})
+    .catch(error => Promise.reject(error));
 function search_Button_Clicked(city_name) {
     try {
         $('#content').css('display', 'none');
@@ -38,14 +46,6 @@ function search_Button_Clicked(city_name) {
             throw 'City name cannot be blank';
         $('#current').children().remove();
         $('#fiveday').children().remove();
-        const fetch_Function = (fetch_url) => fetch(fetch_url)
-            .then(fetch_response => {
-            if (!fetch_response.ok)
-                throw `Error: ${fetch_response.status}\nResponse: ${fetch_response.statusText}`;
-            else
-                return fetch_response.json();
-        })
-            .catch(error => Promise.reject(error));
         Promise.all([
             fetch_Function(`https://api.openweathermap.org/data/2.5/weather?q=${city_name}&appid=${api_key}&units=metric`)
                 .then(response_data => {

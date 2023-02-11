@@ -42,6 +42,16 @@ function check_And_Init_Saved_City_Names(city_name:any){
 	}
 }
 
+// define a function that returns a promise
+const fetch_Function = (fetch_url: string) =>
+    fetch(fetch_url)
+        .then(fetch_response => {
+            if (!fetch_response.ok)
+                throw `Error: ${fetch_response.status}\nResponse: ${fetch_response.statusText}`
+            else return fetch_response.json()
+        })
+        .catch(error => Promise.reject(error))
+
 function search_Button_Clicked(city_name:string|number|string[]|undefined) {
 	try {
 		$('#content').css('display','none')
@@ -51,17 +61,7 @@ function search_Button_Clicked(city_name:string|number|string[]|undefined) {
 		$('#current').children().remove()
 		$('#fiveday').children().remove()
 		
-		// define a function that returns a promise
-		const fetch_Function = (fetch_url: string) =>
-		fetch(fetch_url)
-			.then(fetch_response => {
-				if (!fetch_response.ok)
-					throw `Error: ${fetch_response.status}\nResponse: ${fetch_response.statusText}`
-				else return fetch_response.json()
-			})
-			.catch(error => Promise.reject(error))
-		
-		// run ^^^ function twice with different parameters
+		// run fetch_function twice with different parameters
 		Promise.all([
 			fetch_Function(`https://api.openweathermap.org/data/2.5/weather?q=${city_name}&appid=${api_key}&units=metric`)
 				.then(response_data => {
